@@ -4,8 +4,8 @@ namespace Snowflakes;
 
 class Molecule
 {
-    const SNOWFLAKE_STATE_FREE = 0;
-    const SNOWFLAKE_STATE_FROZEN = 1;
+    const MOLEKULE_STATE_FREE = 0;
+    const MOLEKULE_STATE_FROZEN = 1;
 
     /**
     * @return int

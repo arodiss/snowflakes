@@ -13,7 +13,9 @@ $player = new Player(
 	$input->getParameterOption(['--width', '-w'], 200),
 	$input->getParameterOption(['--height', '-h'], 200),
 	$input->getParameterOption(['--num-molecules', '-m'], null),
-	$input->getParameterOption(['--max-steps', '-s'], 10000),
+	$input->getParameterOption(['--max-frames', '-s'], 10000),
+	$input->getParameterOption(['--stop-when-crystalized'], .5),
+	$input->getParameterOption(['--display-nth-step'], 5),
 	$input->getParameterOption(['--fps'], null),
 	$input->getParameterOption(['--out', '-o'], null)
 );

@@ -25,9 +25,9 @@ class Renderer
 		foreach ($molecules as $molecule) {
 			if ($molecule->getState() == Molecule::MOLECULE_STATE_FREE) {
 				imagesetpixel($gd, $molecule->getX(), $molecule->getY(), $free);
-			} else if ($molecule->getState() == Molecule::MOLECULE_STATE_FROZEN) {
+			} elseif ($molecule->getState() == Molecule::MOLECULE_STATE_FROZEN) {
 				imagesetpixel($gd, $molecule->getX(), $molecule->getY(), $frozen);
-			} else if ($molecule->getState() == Molecule::MOLECULE_STATE_CRYSTAL_CENTER) {
+			} elseif ($molecule->getState() == Molecule::MOLECULE_STATE_CRYSTAL_CENTER) {
 				imagesetpixel($gd, $molecule->getX(), $molecule->getY(), $center);
 			}
 		}

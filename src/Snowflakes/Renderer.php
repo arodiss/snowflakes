@@ -19,8 +19,8 @@ class Renderer
 	 */
 	public function render($molecules, $outputFilename) {
 		$gd = imagecreatetruecolor($this->width, $this->height);
-		$frozen = imagecolorallocate($gd, 185, 184, 181);
-		$free = imagecolorallocate($gd, 0, 255, 255); 
+		$free = imagecolorallocate($gd, 185, 184, 181);
+        $frozen = imagecolorallocate($gd, 0, 255, 255);
 		foreach ($molecules as $molecule) {
 			if ($molecule->getState() == Molecule::MOLECULE_STATE_FREE) {
 				imagesetpixel($gd, $molecule->getX(), $molecule->getY(), $free);

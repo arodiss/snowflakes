@@ -71,7 +71,12 @@ class Molecule
             [$this->getX(), $this->getY() + 1],
             [$this->getX(), $this->getY() - 1],
             [$this->getX() + 1, $this->getY()],
-            [$this->getX() - 1, $this->getY()]
+            [$this->getX() - 1, $this->getY()],
+
+            [$this->getX() + 1, $this->getY() + 1],
+            [$this->getX() - 1, $this->getY() + 1],
+            [$this->getX() + 1, $this->getY() - 1],
+            [$this->getX() - 1, $this->getY() - 1],
         ];
     }
 }

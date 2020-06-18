@@ -1,0 +1,21 @@
+{
+    "name": "gleb/snowflakes",
+    "description": "Simple snowflake emulator",
+    "type": "project",
+    "require": {
+        "ext-gd": "*",
+        "symfony/console": "^5.1"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "arodiss",
+            "email": "gleb.sidora@gmail.com"
+        }
+    ]
+}

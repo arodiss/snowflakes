@@ -10,7 +10,7 @@ class Molecule
 
     private $x;
     private $y;
-    private $state = 0;
+    private $state = self::MOLECULE_STATE_FREE;
 
     public function __construct($x, $y)
     {

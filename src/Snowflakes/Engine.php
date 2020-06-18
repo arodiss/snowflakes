@@ -25,12 +25,12 @@ class Engine
     */
     public function __construct($width, $height, $numMolecules = null, $crystalCenters = null) {
         if ( ! is_int($width) || $width <= 0) {
-            throw new \RuntimeException("Width should be positive integer");
+            throw new \InvalidArgumentException("Width should be positive integer");
         }
         $this->width = $width;
 
         if (! is_int($height) || $height <= 0) {
-            throw new \RuntimeException("Height should be positive integer");
+            throw new \InvalidArgumentException("Height should be positive integer");
         }
         $this->height = $height;
 
@@ -51,7 +51,7 @@ class Engine
                         $this->addNeighborsToFreezingSpots($center);
                 } else {
 //                    for now several valid but identical crystal centers are ok
-                    throw new \RuntimeException("Wrong format for crystal centers");
+                    throw new \InvalidArgumentException("Wrong format for crystal centers");
                 }
             }
         }
@@ -61,7 +61,7 @@ class Engine
             $numMolecules = intval($square * $this::DEFAULT_MOLECULES_DENSITY_COEFFICIENT);
         }
         if ($numMolecules + count($crystalCenters) > $square) {
-            throw new \RuntimeException("Too many molecules and crystal centers for this area.");
+            throw new \InvalidArgumentException("Too many molecules and crystal centers for this area.");
         } else {
             $this->numMolecules = $numMolecules;
             foreach ($this->frozenMolecules as $frozenMolecule) {
@@ -90,7 +90,6 @@ class Engine
     */
     public function step() {
         $this->stepsCounter += 1;
-//        step is made by 1 point, in four directions only;
 //        there could potentially be more than one molecule in each point
         foreach ($this->freeMolecules as $molecule) {
             $possibleCoordinates = $molecule->getNeighboringCoordinates();
@@ -114,14 +113,14 @@ class Engine
      */
     public function getFreeMoleculesShare()
     {
-        return $this->freeMolecules / ($this->freeMolecules + $this->frozenMolecules);
+        return count($this->freeMolecules) / ( count($this->freeMolecules) + count($this->frozenMolecules));
     }
 
     /**
      * @param Molecule $molecule
      */
     private function addNeighborsToFreezingSpots(Molecule $molecule) {
-        $this->freezingSpots = array_unique($this->freezingSpots + [$molecule->getNeighboringCoordinates()]);
+        $this->freezingSpots = array_unique(array_merge($this->freezingSpots, $molecule->getNeighboringCoordinates()), SORT_REGULAR);
     }
 
     private function makeFreezing() {

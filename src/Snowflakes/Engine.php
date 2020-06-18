@@ -4,7 +4,7 @@ namespace Snowflakes;
 
 class Engine
 {
-    const DEFAULT_MOLECULES_DENSITY_COEFFICIENT = 0.02;
+    const DEFAULT_MOLECULES_DENSITY_COEFFICIENT = 0.1;
 
     private $width;
     private $height;
@@ -110,22 +110,18 @@ class Engine
     }
 
     /**
+     * @return float
+     */
+    public function getFreeMoleculesShare()
+    {
+        return $this->freeMolecules / ($this->freeMolecules + $this->frozenMolecules);
+    }
+
+    /**
      * @param Molecule $molecule
      */
     private function addNeighborsToFreezingSpots(Molecule $molecule) {
         $this->freezingSpots = array_unique($this->freezingSpots + [$molecule->getNeighboringCoordinates()]);
-    }
-
-    /**
-     * @param $min
-     * @param $max
-     * @param $quantity
-     * @return array
-     */
-    private function UniqueRandomNumbersWithinRange($min, $max, $quantity) {
-        $numbers = range($min, $max);
-        shuffle($numbers);
-        return array_slice($numbers, 0, $quantity);
     }
 
     private function makeFreezing() {
@@ -149,19 +145,21 @@ class Engine
 
     public function debug()
     {
-        echo 'steps: ' . $this->stepsCounter . PHP_EOL;
-        echo 'free'. PHP_EOL;
-        var_dump($this->freeMolecules);
-        echo 'frozen'. PHP_EOL;
-        var_dump($this->frozenMolecules);
-        echo 'spots'. PHP_EOL;
-        var_dump($this->freezingSpots);
-
-
-
 //        echo 'steps: ' . $this->stepsCounter . PHP_EOL;
-//        echo 'free' . count($this->freeMolecules) . PHP_EOL;
-//        echo 'frozen' . count($this->frozenMolecules) . PHP_EOL;
-//        echo 'spots' . count($this->freezingSpots) . PHP_EOL;
+//        echo 'free'. PHP_EOL;
+//        var_dump($this->freeMolecules);
+//        echo 'frozen'. PHP_EOL;
+//        var_dump($this->frozenMolecules);
+//        echo 'spots'. PHP_EOL;
+//        var_dump($this->freezingSpots);
+
+
+
+        echo 'steps: ' . $this->stepsCounter . PHP_EOL;
+        echo 'free' . count($this->freeMolecules) . PHP_EOL;
+        echo 'frozen' . count($this->frozenMolecules) . PHP_EOL;
+        echo 'spots' . count($this->freezingSpots) . PHP_EOL;
+
+        var_dump($this->freezingSpots);
     }
 } 

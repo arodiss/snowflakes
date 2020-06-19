@@ -8,11 +8,9 @@ class Engine
 
     private $width;
     private $height;
-    private $numMolecules;
+    private $freezingRanges;
     private $freeMolecules = [];
     private $frozenMolecules = [];
-    private $freezingSpots = [];
-    private $stepsCounter = 0;
 
     /**
     * Creates new engine instance
@@ -34,26 +32,22 @@ class Engine
         }
         $this->height = $height;
 
+        $this->freezingRanges = new RangeMetaCollection();
         if ($crystalCenters === null) {
-            $center = new Molecule(intval(ceil($width / 2)), intval(ceil($height / 2)));
-            $center->markAsCrystalCenter();
-            $this->frozenMolecules[] = $center;
-            $this->addNeighborsToFreezingSpots($center);
-            $crystalCenters = [$center];
-        } else {
-            foreach ($crystalCenters as $crystalCenter) {
-                if (is_array($crystalCenter) && count($crystalCenter) == 2 &&
-                    is_int($crystalCenter[0]) && $crystalCenter[0] < $width &&
-                    is_int($crystalCenter[1]) && $crystalCenter[0] < $height) {
-                        $center = new Molecule($crystalCenter[0], $crystalCenter[1]);
-                        $center->markAsCrystalCenter();
-                        $this->frozenMolecules[] = $center;
-                        $this->addNeighborsToFreezingSpots($center);
-                } else {
-//                    for now several valid but identical crystal centers are ok
-                    throw new \InvalidArgumentException("Wrong format for crystal centers");
-                }
-            }
+            $crystalCenters = [[(int) ceil($width / 2), (int) ceil($height / 2)]];
+        }
+        foreach ($crystalCenters as $crystalCenter) {
+            if (is_array($crystalCenter) && count($crystalCenter) == 2 &&
+                is_int($crystalCenter[0]) && $crystalCenter[0] < $width &&
+                is_int($crystalCenter[1]) && $crystalCenter[0] < $height) {
+                    $center = new Molecule($crystalCenter[0], $crystalCenter[1]);
+                    $center->markAsCrystalCenter();
+                    $this->frozenMolecules[] = $center;
+                    $this->addNeighborsToFreezingSpots($center);
+           } else {
+               //for now several valid but identical crystal centers are ok
+               throw new \InvalidArgumentException("Wrong format for crystal centers");
+           }
         }
 
         $square = $width * $height;
@@ -62,19 +56,11 @@ class Engine
         }
         if ($numMolecules + count($crystalCenters) > $square) {
             throw new \InvalidArgumentException("Too many molecules and crystal centers for this area.");
-        } else {
-            $this->numMolecules = $numMolecules;
-            foreach ($this->frozenMolecules as $frozenMolecule) {
-                $this->addNeighborsToFreezingSpots($frozenMolecule);
-            }
         }
 
-        $moleculesXs = range(0, $width);
-        $moleculesYs = range(0, $height);
-
         $generatedMolecules = [];
-        foreach ($moleculesXs as $x) {
-            foreach ($moleculesYs as $y) {
+        foreach (range(0, $width) as $x) {
+            foreach (range(0, $height) as $y) {
                 $generatedMolecules[] = new Molecule($x, $y);
             }
         }
@@ -89,16 +75,15 @@ class Engine
     * Run the entire system one step forward
     */
     public function step() {
-        $this->stepsCounter += 1;
 //        there could potentially be more than one molecule in each point
         foreach ($this->freeMolecules as $molecule) {
             $possibleCoordinates = $molecule->getNeighboringCoordinates();
             $newCoordinates = $possibleCoordinates[array_rand($possibleCoordinates)];
-            $molecule->setX($newCoordinates[0]);
-            $molecule->setY($newCoordinates[1]);
+            $molecule->setX(max(min($newCoordinates[0], $this->width), 0));
+            $molecule->setY(max(min($newCoordinates[1], $this->height), 0));
         }
 
-        $this-> makeFreezing();
+        $this->makeFreezing();
     }
 
     /**
@@ -120,45 +105,26 @@ class Engine
      * @param Molecule $molecule
      */
     private function addNeighborsToFreezingSpots(Molecule $molecule) {
-        $this->freezingSpots = array_unique(array_merge($this->freezingSpots, $molecule->getNeighboringCoordinates()), SORT_REGULAR);
+        foreach (range(max($molecule->getX()-1, 0), min($molecule->getX()+1, $this->width)) as $x) {
+            foreach (range(max($molecule->getY()-1, 0), min($molecule->getY()+1, $this->height)) as $y) {
+                $this->freezingRanges->add($x, $y);
+            }
+        }
     }
 
     private function makeFreezing() {
         foreach ($this->freeMolecules as $molecule) {
-            if (in_array([$molecule->getX(), $molecule->getY()], $this->freezingSpots)) {
+            if ($this->shouldFreeze($molecule)) {
                 $molecule->freeze();
                 $this->frozenMolecules[] = $molecule;
                 unset($this->freeMolecules[array_search($molecule, $this->freeMolecules)]);
                 $this->addNeighborsToFreezingSpots($molecule);
             }
         }
+	$this->freezingRanges->flush();
     }
 
-    /**
-     * @return bool
-     */
-    public function areFurtherChangesPossible()
-    {
-        return count($this->freeMolecules) > 0;
-    }
-
-    public function debug()
-    {
-//        echo 'steps: ' . $this->stepsCounter . PHP_EOL;
-//        echo 'free'. PHP_EOL;
-//        var_dump($this->freeMolecules);
-//        echo 'frozen'. PHP_EOL;
-//        var_dump($this->frozenMolecules);
-//        echo 'spots'. PHP_EOL;
-//        var_dump($this->freezingSpots);
-
-
-
-        echo 'steps: ' . $this->stepsCounter . PHP_EOL;
-        echo 'free' . count($this->freeMolecules) . PHP_EOL;
-        echo 'frozen' . count($this->frozenMolecules) . PHP_EOL;
-        echo 'spots' . count($this->freezingSpots) . PHP_EOL;
-
-        var_dump($this->freezingSpots);
+    private function shouldFreeze($molecule) {
+        return $this->freezingRanges->contains($molecule->getX(), $molecule->getY());
     }
 } 

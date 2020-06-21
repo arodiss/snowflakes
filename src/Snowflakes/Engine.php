@@ -124,7 +124,11 @@ class Engine
 	$this->freezingRanges->flush();
     }
 
-    private function shouldFreeze($molecule) {
+    /**
+     * @param $molecule
+     * @return bool
+     */
+    private function shouldFreeze(Molecule $molecule) {
         return $this->freezingRanges->contains($molecule->getX(), $molecule->getY());
     }
 } 
